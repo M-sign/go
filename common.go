@@ -3,6 +3,7 @@ package msign
 import (
 	"bufio"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"io"
 	"strings"
@@ -33,6 +34,10 @@ var (
 
 func NewPrivateKey() (PrivateKey, PublicKey, error) {
 	return newPrivateKeyV1()
+}
+
+func (k KeyId) String() string {
+	return hex.EncodeToString(k)
 }
 
 func ImportPublicKey(r io.Reader) (PublicKey, error) {

@@ -37,6 +37,12 @@ func (p *privateKeyV1) Sign(message io.Reader) (Signature, error) {
 	return sig, nil
 }
 
+func (p *privateKeyV1) Id() KeyId {
+	id := make(KeyId, sizeIDv1)
+	copy(id, p.id[:])
+	return id
+}
+
 func (p *privateKeyV1) export(w io.Writer) error {
 	_, err := w.Write([]byte(PrefixKEY))
 	if err != nil {
@@ -91,6 +97,12 @@ func (p *publicKeyV1) Verify(message io.Reader, sign Signature) (bool, error) {
 	return ed25519.Verify(ed25519.PublicKey(p.bytes[:]), sha512.Sum(nil), sig.bytes[:]), nil
 }
 
+func (p *publicKeyV1) Id() KeyId {
+	id := make(KeyId, sizeIDv1)
+	copy(id, p.id[:])
+	return id
+}
+
 func (p *publicKeyV1) export(w io.Writer) error {
 	_, err := w.Write([]byte(PrefixPUB))
 	if err != nil {
@@ -121,6 +133,12 @@ func (p *publicKeyV1) export(w io.Writer) error {
 type signatureV1 struct {
 	id    [sizeIDv1]byte
 	bytes [ed25519.SignatureSize]byte
+}
+
+func (s *signatureV1) KeyId() KeyId {
+	id := make(KeyId, sizeIDv1)
+	copy(id, s.id[:])
+	return id
 }
 
 func (s *signatureV1) export(w io.Writer) error {
@@ -238,3 +256,10 @@ func newPrivateKeyV1() (PrivateKey, PublicKey, error) {
 
 	return privateKey, publicKey, nil
 }
+
+// Sanity check types implement the interfaces
+var (
+	_ PublicKey  = &publicKeyV1{}
+	_ PrivateKey = &privateKeyV1{}
+	_ Signature  = &signatureV1{}
+)
