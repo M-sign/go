@@ -10,6 +10,7 @@ type KeyId []byte
 type PrivateKey interface {
 	exporter
 	Id() KeyId
+	Public() PublicKey
 	Sign(io.Reader) (Signature, error)
 }
 

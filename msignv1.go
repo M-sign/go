@@ -43,6 +43,13 @@ func (p *privateKeyV1) Id() KeyId {
 	return id
 }
 
+func (p *privateKeyV1) Public() PublicKey {
+	pub := &publicKeyV1{}
+	copy(pub.id[:], p.id[:])
+	copy(pub.bytes[:], p.bytes[32:]) // see https://golang.org/pkg/crypto/ed25519/#PrivateKey (Public() method)
+	return pub
+}
+
 func (p *privateKeyV1) export(w io.Writer) error {
 	_, err := w.Write([]byte(PrefixKEY))
 	if err != nil {
