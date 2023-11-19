@@ -23,6 +23,10 @@ type privateKeyV1 struct {
 }
 
 func (p *privateKeyV1) Sign(message io.Reader) (Signature, error) {
+	if message == nil {
+		return nil, ErrNilReader
+	}
+
 	sha512 := sha512.New()
 	_, err := io.Copy(sha512, message)
 	if err != nil {
@@ -86,6 +90,10 @@ type publicKeyV1 struct {
 }
 
 func (p *publicKeyV1) Verify(message io.Reader, sign Signature) (bool, error) {
+	if message == nil {
+		return false, ErrNilReader
+	}
+
 	sig, ok := sign.(*signatureV1)
 	if !ok {
 		return false, ErrInvalidSignature
@@ -207,7 +215,7 @@ func getPrivateKeyV1(priv []byte) (PrivateKey, error) {
 		return nil, ErrInvalidKeyFormat
 	}
 
-	if priv[0] != 1 {
+	if priv[0] != VersionOne {
 		return nil, ErrInvalidKeyFormat
 	}
 
@@ -229,7 +237,7 @@ func getSignatureV1(sign []byte) (Signature, error) {
 		return nil, ErrInvalidSigFormat
 	}
 
-	if sign[0] != 1 {
+	if sign[0] != VersionOne {
 		return nil, ErrInvalidSigFormat
 	}
 

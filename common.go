@@ -30,6 +30,8 @@ var (
 	ErrInvalidSignature = errors.New("invalid signature")
 	ErrKeyIdMismatch    = errors.New("invalid signature (key id mismatch)")
 	ErrUknownType       = errors.New("unknown export type")
+	ErrNilWriter        = errors.New("nil writer")
+	ErrNilReader        = errors.New("nil reader")
 )
 
 func NewPrivateKey() (PrivateKey, PublicKey, error) {
@@ -41,6 +43,10 @@ func (k KeyId) String() string {
 }
 
 func ImportPublicKey(r io.Reader) (PublicKey, error) {
+	if r == nil {
+		return nil, ErrNilReader
+	}
+
 	br := bufio.NewReader(r)
 	line, err := br.ReadString('\n')
 	if err != nil {
@@ -68,6 +74,10 @@ func ImportPublicKey(r io.Reader) (PublicKey, error) {
 }
 
 func ImportPrivateKey(r io.Reader) (PrivateKey, error) {
+	if r == nil {
+		return nil, ErrNilReader
+	}
+
 	br := bufio.NewReader(r)
 	line, err := br.ReadString('\n')
 	if err != nil {
@@ -95,6 +105,10 @@ func ImportPrivateKey(r io.Reader) (PrivateKey, error) {
 }
 
 func ImportSignature(r io.Reader) (Signature, error) {
+	if r == nil {
+		return nil, ErrNilReader
+	}
+
 	br := bufio.NewReader(r)
 	line, err := br.ReadString('\n')
 	if err != nil {
@@ -122,6 +136,10 @@ func ImportSignature(r io.Reader) (Signature, error) {
 }
 
 func Export(w io.Writer, item any) error {
+	if w == nil {
+		return ErrNilWriter
+	}
+
 	switch i := item.(type) {
 	case PublicKey:
 		return i.export(w)
